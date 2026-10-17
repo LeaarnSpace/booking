@@ -1,5 +1,5 @@
-// Database client (Postgres via Drizzle). Locally this is the Docker Postgres from docker-compose.yml;
-// in production, a hosted Postgres such as Neon.
+// Database client (Postgres via Drizzle). Locally this is the Postgres running on your machine
+// (DBngin, port 5432, database "learnspace"); in production, a hosted Postgres such as Neon.
 import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
@@ -9,8 +9,8 @@ export { schema };
 
 export type Database = PostgresJsDatabase<typeof schema>;
 
-/** Matches docker-compose.yml, so local development works with no settings */
-export const LOCAL_DATABASE_URL = "postgres://learnspace:learnspace@localhost:5433/learnspace";
+/** Default for local development; override with DATABASE_URL */
+export const LOCAL_DATABASE_URL = "postgres://postgres@localhost:5432/learnspace";
 
 function connect(): Database {
   const url = process.env.DATABASE_URL || LOCAL_DATABASE_URL;
