@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+/* Learn Space brand tokens (same values as the website's tokens.css) */
+@theme {
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --color-cobalt-50: #eaf1fb;
+  --color-cobalt-100: #c6dbf4;
+  --color-cobalt-200: #93b8e9;
+  --color-cobalt-400: #2c7ad6;
+  --color-cobalt-600: #004bad;
+  --color-cobalt-700: #003f92;
+  --color-beam-400: #f5b335;
+  --color-ink: #0e1b34;
+  --color-ink-strong: #040617;
+  --color-muted: #4a4d6a;
+  --color-subtle: #5a6b85;
+  --color-surface: #f7f9fa;
+  --color-sunk: #f2f5fa;
+  --color-line: #d5dbe6;
+  --color-line-soft: #e4e5f0;
+  --color-danger: #c2410c;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --shadow-card: 0 1px 2px rgba(14, 22, 80, 0.06), 0 1px 1px rgba(14, 22, 80, 0.04);
+  --shadow-pop: 0 12px 32px rgba(14, 27, 52, 0.16);
+}
+
+html {
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible {
+  outline: 2px solid var(--color-cobalt-400);
+  outline-offset: 2px;
+}
