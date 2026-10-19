@@ -1,5 +1,7 @@
-// This package's own database connection. STAFF_DATABASE_URL lets staff identities live in a
-// different database from everything else; by default they share DATABASE_URL.
+// This package's own database connection, used while the apps run. Point it at a pooled URL in
+// production (e.g. Neon's "-pooler" host); `prepare: false` below keeps it compatible with that.
+// STAFF_DATABASE_URL lets staff identities live in a different database; by default they share
+// DATABASE_URL. Migrations use the direct URL instead (see drizzle.config.ts).
 import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
