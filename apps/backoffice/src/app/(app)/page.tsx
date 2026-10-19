@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { requireViewer } from "@/lib/viewer";
 import { ROLES, SECTIONS, can } from "@/lib/sections";
-import { listTeamManagers } from "@/lib/team";
+import { listTeamManagers } from "@learnspace/auth-staff";
 
 export default async function OverviewPage() {
   const viewer = await requireViewer();

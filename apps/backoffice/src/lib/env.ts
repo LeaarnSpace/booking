@@ -8,14 +8,13 @@ const list = (value: string | undefined) =>
 export const env = {
   allowedDomains: list(process.env.ALLOWED_EMAIL_DOMAINS),
   bootstrapAdmins: list(process.env.BOOTSTRAP_ADMIN_EMAILS),
-  googleConfigured: Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
-  /** Email + password sign-in for local development; never enabled in production */
-  devLogin: process.env.DEV_LOGIN === "true" && process.env.NODE_ENV !== "production",
+  google:
+    process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? { clientId: process.env.GOOGLE_CLIENT_ID, clientSecret: process.env.GOOGLE_CLIENT_SECRET }
+      : undefined,
+  /** Sign in with an emailed code: local development only, never in production */
+  devEmailSignIn: process.env.DEV_EMAIL_SIGN_IN === "true" && process.env.NODE_ENV !== "production",
+  /** Where outgoing email goes; defaults to Mailpit on this machine */
+  smtpUrl: process.env.SMTP_URL || "smtp://localhost:1025",
+  mailFrom: process.env.MAIL_FROM || "Learn Space <no-reply@learnspace.ng>",
 };
-
-/** True when the address belongs to one of the allowed company domains */
-export function isAllowedEmail(email: string | undefined | null) {
-  if (!email) return false;
-  const domain = email.toLowerCase().split("@")[1];
-  return env.allowedDomains.length > 0 && env.allowedDomains.includes(domain);
-}

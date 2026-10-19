@@ -1,10 +1,10 @@
-// Fast check before any page renders: no session cookie → straight to the sign-in page.
+// Fast check before any page renders: no staff session cookie → straight to the sign-in page.
 // (Pages still verify the session and access on the server; this only saves a round trip.)
 import { NextResponse, type NextRequest } from "next/server";
-import { getSessionCookie } from "better-auth/cookies";
+import { hasStaffSessionCookie } from "@learnspace/auth-staff/next";
 
 export function proxy(request: NextRequest) {
-  if (!getSessionCookie(request)) {
+  if (!hasStaffSessionCookie(request)) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
   return NextResponse.next();

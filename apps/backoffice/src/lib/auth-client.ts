@@ -1,4 +1,4 @@
 "use client";
-import { createAuthClient } from "better-auth/react";
+import { createStaffAuthClient } from "@learnspace/auth-staff/client";
 
-export const authClient = createAuthClient();
+export const authClient = createStaffAuthClient();

@@ -3,12 +3,12 @@ import { redirect } from "next/navigation";
 import { Logo } from "@/components/ui/logo";
 import { getViewer } from "@/lib/viewer";
 import { env } from "@/lib/env";
-import { DevSignIn, GoogleSignIn } from "./sign-in-buttons";
+import { EmailCodeSignIn, GoogleSignIn } from "./sign-in-buttons";
 
 export const metadata: Metadata = { title: "Sign in" };
 
 const ERRORS: Record<string, string> = {
-  domain_not_allowed: "That Google account isn't a Learn Space account. Sign in with your work email.",
+  domain_not_allowed: "That isn't a Learn Space account. Sign in with your work email.",
   access_denied: "Google sign-in was cancelled.",
 };
 
@@ -54,14 +54,14 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
           )}
 
           <div className="mt-8 flex flex-col gap-4">
-            {env.googleConfigured ? (
+            {env.google ? (
               <GoogleSignIn />
             ) : (
               <p className="rounded-md border border-line bg-white px-4 py-3 text-sm text-subtle">
                 Google sign-in isn&apos;t set up yet. Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to the environment.
               </p>
             )}
-            {env.devLogin && <DevSignIn domain={env.allowedDomains[0] ?? "example.com"} />}
+            {env.devEmailSignIn && <EmailCodeSignIn domain={env.allowedDomains[0] ?? "example.com"} />}
           </div>
         </div>
       </section>

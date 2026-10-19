@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireSection } from "@/lib/viewer";
 import { ROLES, SECTIONS, can } from "@/lib/sections";
-import { listPeople } from "@/lib/team";
+import { listStaff } from "@learnspace/auth-staff";
 import { env } from "@/lib/env";
 import { AccessSelect, AddPersonForm, RemovePersonButton } from "./team-controls";
 
@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Team & access" };
 export default async function TeamPage() {
   const viewer = await requireSection("team");
   const canManage = can(viewer.access, "team", "manager");
-  const people = await listPeople();
+  const people = await listStaff();
 
   return (
     <div className="flex flex-col gap-8">

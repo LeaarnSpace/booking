@@ -1,6 +1,9 @@
-CREATE TYPE "public"."role" AS ENUM('viewer', 'editor', 'manager');--> statement-breakpoint
-CREATE TYPE "public"."section" AS ENUM('website', 'bookings', 'projects', 'team');--> statement-breakpoint
-CREATE TABLE "account" (
+-- IF NOT EXISTS: the migration history table lives in this schema, so drizzle creates it first
+CREATE SCHEMA IF NOT EXISTS "staff";
+--> statement-breakpoint
+CREATE TYPE "staff"."role" AS ENUM('viewer', 'editor', 'manager');--> statement-breakpoint
+CREATE TYPE "staff"."section" AS ENUM('website', 'bookings', 'projects', 'team');--> statement-breakpoint
+CREATE TABLE "staff"."account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,
 	"provider_id" text NOT NULL,
@@ -11,22 +14,21 @@ CREATE TABLE "account" (
 	"access_token_expires_at" timestamp,
 	"refresh_token_expires_at" timestamp,
 	"scope" text,
-	"password" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "section_access" (
+CREATE TABLE "staff"."section_access" (
 	"email" text NOT NULL,
-	"section" "section" NOT NULL,
-	"role" "role" NOT NULL,
+	"section" "staff"."section" NOT NULL,
+	"role" "staff"."role" NOT NULL,
 	"granted_by" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "section_access_email_section_pk" PRIMARY KEY("email","section")
 );
 --> statement-breakpoint
-CREATE TABLE "session" (
+CREATE TABLE "staff"."session" (
 	"id" text PRIMARY KEY NOT NULL,
 	"token" text NOT NULL,
 	"expires_at" timestamp NOT NULL,
@@ -38,7 +40,7 @@ CREATE TABLE "session" (
 	CONSTRAINT "session_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
-CREATE TABLE "user" (
+CREATE TABLE "staff"."user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"email" text NOT NULL,
@@ -49,7 +51,7 @@ CREATE TABLE "user" (
 	CONSTRAINT "user_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
-CREATE TABLE "verification" (
+CREATE TABLE "staff"."verification" (
 	"id" text PRIMARY KEY NOT NULL,
 	"identifier" text NOT NULL,
 	"value" text NOT NULL,
@@ -58,7 +60,7 @@ CREATE TABLE "verification" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "account_user_idx" ON "account" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "session_user_idx" ON "session" USING btree ("user_id");
+ALTER TABLE "staff"."account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "staff"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "staff"."session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "staff"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "account_user_idx" ON "staff"."account" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "session_user_idx" ON "staff"."session" USING btree ("user_id");

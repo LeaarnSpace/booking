@@ -1,0 +1,1 @@
+ALTER TABLE "staff"."account" ADD COLUMN "password" text;

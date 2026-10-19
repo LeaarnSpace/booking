@@ -4,7 +4,7 @@ import { ShieldOff } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { buttonStyles } from "@/components/ui/button";
 import { SECTIONS } from "@/lib/sections";
-import { listTeamManagers } from "@/lib/team";
+import { listTeamManagers } from "@learnspace/auth-staff";
 
 export const metadata: Metadata = { title: "No access" };
 

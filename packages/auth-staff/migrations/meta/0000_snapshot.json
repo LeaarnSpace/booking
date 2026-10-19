@@ -1,12 +1,12 @@
 {
-  "id": "23432d94-e3c2-4db3-b78b-86c40f37c5bb",
+  "id": "19f54744-a815-4d0a-9924-6aa95b2a4ccb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.account": {
+    "staff.account": {
       "name": "account",
-      "schema": "",
+      "schema": "staff",
       "columns": {
         "id": {
           "name": "id",
@@ -68,12 +68,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "password": {
-          "name": "password",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -111,12 +105,9 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "schemaTo": "staff",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -127,9 +118,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.section_access": {
+    "staff.section_access": {
       "name": "section_access",
-      "schema": "",
+      "schema": "staff",
       "columns": {
         "email": {
           "name": "email",
@@ -140,14 +131,14 @@
         "section": {
           "name": "section",
           "type": "section",
-          "typeSchema": "public",
+          "typeSchema": "staff",
           "primaryKey": false,
           "notNull": true
         },
         "role": {
           "name": "role",
           "type": "role",
-          "typeSchema": "public",
+          "typeSchema": "staff",
           "primaryKey": false,
           "notNull": true
         },
@@ -177,10 +168,7 @@
       "compositePrimaryKeys": {
         "section_access_email_section_pk": {
           "name": "section_access_email_section_pk",
-          "columns": [
-            "email",
-            "section"
-          ]
+          "columns": ["email", "section"]
         }
       },
       "uniqueConstraints": {},
@@ -188,9 +176,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.session": {
+    "staff.session": {
       "name": "session",
-      "schema": "",
+      "schema": "staff",
       "columns": {
         "id": {
           "name": "id",
@@ -265,12 +253,9 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "schemaTo": "staff",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -280,18 +265,16 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.user": {
+    "staff.user": {
       "name": "user",
-      "schema": "",
+      "schema": "staff",
       "columns": {
         "id": {
           "name": "id",
@@ -346,18 +329,16 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.verification": {
+    "staff.verification": {
       "name": "verification",
-      "schema": "",
+      "schema": "staff",
       "columns": {
         "id": {
           "name": "id",
@@ -408,27 +389,20 @@
     }
   },
   "enums": {
-    "public.role": {
+    "staff.role": {
       "name": "role",
-      "schema": "public",
-      "values": [
-        "viewer",
-        "editor",
-        "manager"
-      ]
+      "schema": "staff",
+      "values": ["viewer", "editor", "manager"]
     },
-    "public.section": {
+    "staff.section": {
       "name": "section",
-      "schema": "public",
-      "values": [
-        "website",
-        "bookings",
-        "projects",
-        "team"
-      ]
+      "schema": "staff",
+      "values": ["website", "bookings", "projects", "team"]
     }
   },
-  "schemas": {},
+  "schemas": {
+    "staff": "staff"
+  },
   "sequences": {},
   "roles": {},
   "policies": {},

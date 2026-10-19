@@ -2,10 +2,9 @@
 import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { eq } from "drizzle-orm";
-import { db, sectionAccess } from "@learnspace/db";
+import { getAccess, isAllowedEmail } from "@learnspace/auth-staff";
 import { auth } from "./auth";
-import { isAllowedEmail } from "./env";
+import { env } from "./env";
 import { can, type Access, type Role, type Section } from "./sections";
 
 export interface Viewer {
@@ -20,15 +19,14 @@ export interface Viewer {
 export const getViewer = cache(async (): Promise<Viewer | null> => {
   const session = await auth.api.getSession({ headers: await headers() });
   // Re-check the domain on every request, in case the allowed list changed
-  if (!session || !isAllowedEmail(session.user.email)) return null;
+  if (!session || !isAllowedEmail(session.user.email, env.allowedDomains)) return null;
   const email = session.user.email.toLowerCase();
-  const grants = await db.select().from(sectionAccess).where(eq(sectionAccess.email, email));
   return {
     id: session.user.id,
     name: session.user.name,
     email,
     image: session.user.image ?? null,
-    access: Object.fromEntries(grants.map((g) => [g.section, g.role])),
+    access: await getAccess(email),
   };
 });
 

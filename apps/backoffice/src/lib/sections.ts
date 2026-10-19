@@ -1,8 +1,8 @@
 // The back office is one app split into sections. Each person has a role per section; the sidebar,
 // pages and actions all check it. Add a section here (and to `sectionEnum` in @learnspace/db).
-import type { Role, Section } from "@learnspace/db/schema";
+import type { Access, Role, Section } from "@learnspace/auth-staff";
 
-export type { Role, Section };
+export type { Access, Role, Section };
 
 export interface NavItem {
   label: string;
@@ -67,9 +67,6 @@ export const ROLES: { id: Role; label: string; description: string }[] = [
 ];
 
 const RANK: Record<Role, number> = { viewer: 1, editor: 2, manager: 3 };
-
-/** Section → role for one person; a missing section means no access */
-export type Access = Partial<Record<Section, Role>>;
 
 /** True when `access` gives at least `min` in `section` */
 export function can(access: Access, section: Section, min: Role = "viewer") {

@@ -1,11 +1,12 @@
 {
-  "name": "@learnspace/db",
+  "name": "@learnspace/auth-staff",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./schema": "./src/schema.ts"
+    "./next": "./src/next.ts",
+    "./client": "./src/client.ts"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",
@@ -14,6 +15,7 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
+    "better-auth": "1.7.11",
     "drizzle-orm": "^0.45.4",
     "postgres": "^3.4.9"
   },
@@ -21,5 +23,9 @@
     "@types/node": "^22",
     "drizzle-kit": "^0.31.11",
     "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "next": ">=16",
+    "react": ">=19"
   }
 }

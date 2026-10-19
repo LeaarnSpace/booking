@@ -1,0 +1,31 @@
+// This package's own database connection. STAFF_DATABASE_URL lets staff identities live in a
+// different database from everything else; by default they share DATABASE_URL.
+import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import * as schema from "./schema";
+
+export type StaffDatabase = PostgresJsDatabase<typeof schema>;
+
+/** Local development default (Postgres on this machine, database "learnspace") */
+export const LOCAL_DATABASE_URL = "postgres://postgres@localhost:5432/learnspace";
+
+export const databaseUrl = () =>
+  process.env.STAFF_DATABASE_URL ||
+  process.env.DATABASE_URL ||
+  (process.env.NODE_ENV === "production" ? "" : LOCAL_DATABASE_URL);
+
+const globalForDb = globalThis as unknown as { learnspaceStaffDb?: StaffDatabase };
+
+function connect(): StaffDatabase {
+  const url = databaseUrl();
+  if (!url) throw new Error("Set STAFF_DATABASE_URL or DATABASE_URL in production");
+  return drizzle(postgres(url, { prepare: false }), { schema });
+}
+
+/** Connects on first use, so builds that import this module don't need a database */
+export const db = new Proxy({} as StaffDatabase, {
+  get(_, prop) {
+    globalForDb.learnspaceStaffDb ??= connect();
+    return Reflect.get(globalForDb.learnspaceStaffDb, prop, globalForDb.learnspaceStaffDb);
+  },
+});
