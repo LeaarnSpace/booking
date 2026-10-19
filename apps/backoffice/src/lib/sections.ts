@@ -23,7 +23,7 @@ export const SECTIONS: SectionConfig[] = [
   {
     id: "website",
     label: "Website",
-    description: "Job roles, news and blog posts on learnspace.ng",
+    description: "Job roles, news and blog posts on learnspace.com.ng",
     icon: "globe",
     href: "/website",
     items: [

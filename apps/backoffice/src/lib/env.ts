@@ -16,5 +16,5 @@ export const env = {
   devEmailSignIn: process.env.DEV_EMAIL_SIGN_IN === "true" && process.env.NODE_ENV !== "production",
   /** Where outgoing email goes; defaults to Mailpit on this machine */
   smtpUrl: process.env.SMTP_URL || "smtp://localhost:1025",
-  mailFrom: process.env.MAIL_FROM || "Learn Space <no-reply@learnspace.ng>",
+  mailFrom: process.env.MAIL_FROM || "Learn Space <no-reply@learnspace.com.ng>",
 };

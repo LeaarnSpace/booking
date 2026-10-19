@@ -11,7 +11,7 @@ import { grantEverything } from "./access";
 export const STAFF_COOKIE_PREFIX = "ls-staff";
 
 export interface StaffAuthOptions {
-  /** Only addresses on these domains can sign in, e.g. ["learnspace.ng"] */
+  /** Only addresses on these domains can sign in, e.g. ["learnspace.com.ng"] */
   allowedDomains: string[];
   /** These people become managers of every section the first time they sign in */
   bootstrapAdmins: string[];

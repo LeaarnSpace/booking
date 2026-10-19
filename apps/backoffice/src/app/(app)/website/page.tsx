@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Website" };
 export default async function Page() {
   await requireSection("website");
   return (
-    <ComingSoon title="Website" description="Content shown on learnspace.ng.">
+    <ComingSoon title="Website" description="Content shown on learnspace.com.ng.">
       Roles, news stories and blog posts will be edited here and published to the website.
     </ComingSoon>
   );
