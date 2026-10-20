@@ -1,0 +1,44 @@
+# Applies staff database migrations to production when they reach main.
+# The direct (unpooled) Neon URL lives only in the "production" GitHub environment's secrets:
+# it never reaches Vercel, the website, or pull requests from forks.
+name: Database migrations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/auth-staff/migrations/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Never run two migrations at once, and never cancel one halfway through
+concurrency:
+  group: migrate-production
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Check the database secret is set
+        env:
+          DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
+        run: |
+          if [ -z "$DATABASE_URL_UNPOOLED" ]; then
+            echo "::error::Add DATABASE_URL_UNPOOLED (Neon direct URL) to the production environment's secrets"
+            exit 1
+          fi
+      - name: Apply migrations
+        env:
+          DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
+        run: npm run db:migrate
