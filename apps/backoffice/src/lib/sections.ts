@@ -1,5 +1,5 @@
 // The back office is one app split into sections. Each person has a role per section; the sidebar,
-// pages and actions all check it. Add a section here (and to `sectionEnum` in @learnspace/db).
+// pages and actions all check it. Add a section here (and to `sectionEnum` in @learnspace/auth-staff).
 import type { Access, Role, Section } from "@learnspace/auth-staff";
 
 export type { Access, Role, Section };
