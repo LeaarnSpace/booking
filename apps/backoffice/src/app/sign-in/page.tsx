@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { Logo } from "@/components/ui/logo";
 import { getViewer } from "@/lib/viewer";
 import { env } from "@/lib/env";
-import { EmailCodeSignIn, GoogleSignIn } from "./sign-in-buttons";
+import { GoogleSignIn } from "./sign-in-buttons";
 
 export const metadata: Metadata = { title: "Sign in" };
 
@@ -61,7 +61,6 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
                 Google sign-in isn&apos;t set up yet. Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to the environment.
               </p>
             )}
-            {env.devEmailSignIn && <EmailCodeSignIn domain={env.allowedDomains[0] ?? "example.com"} />}
           </div>
         </div>
       </section>
