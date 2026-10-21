@@ -1,0 +1,27 @@
+{
+  "name": "learnspace-booking",
+  "private": true,
+  "packageManager": "npm@10.9.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:backoffice": "turbo run dev --filter=@learnspace/backoffice",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "check": "turbo run check",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "verify": "turbo run check lint build && prettier --check .",
+    "db:generate": "npm run db:generate -w @learnspace/auth-staff",
+    "db:migrate": "npm run db:migrate -w @learnspace/auth-staff",
+    "db:studio": "npm run db:studio -w @learnspace/auth-staff"
+  },
+  "devDependencies": {
+    "drizzle-orm": "^0.45.4",
+    "prettier": "^3.9.10",
+    "turbo": "^2.5.8"
+  }
+}
