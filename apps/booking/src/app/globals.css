@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+/* Booking app tokens, from the Figma "LS-Spaces-Booking" variables */
+@theme {
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --color-primary: #004bad;
+  --color-primary-hover: #003f92;
+  --color-blue-100: #e7ebfd;
+  --color-blue-700: #152a9e;
+  --color-green: #46a37b;
+  --color-green-50: #f3fffa;
+  --color-green-ink: #2a7a57;
+  --color-ink: #14162b;
+  --color-ink-strong: #040617;
+  --color-muted: #4a4d6a;
+  /* Figma's text-400 (#8c8faa) is too faint for small text on white; this keeps its look at 4.6:1 */
+  --color-subtle: #6e7191;
+  --color-placeholder: #8c8faa;
+  --color-line: #e4e5f0;
+  --color-sunk: #f6f7fc;
+  --color-night: #040617;
+
+  --color-pending: #f2a93b;
+  --color-pending-50: #fef6e9;
+  --color-pending-ink: #8a5a00;
+  --color-error: #e5484d;
+  --color-error-50: #fdeced;
+  --color-error-ink: #b4232a;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-sm: 0 1px 2px rgba(14, 22, 80, 0.06);
+  --shadow-pop: 0 12px 32px rgba(14, 27, 52, 0.16);
+}
+
+html {
+  color: var(--color-ink);
+  background: white;
+}
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

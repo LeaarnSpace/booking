@@ -11,6 +11,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Everything except sign-in, the auth API and static files
-  matcher: ["/((?!sign-in|api/auth|_next|favicon.ico|.*\\.(?:svg|png|jpg|ico)$).*)"],
+  // Everything except sign-in, the auth API, static files and local file storage (its links are signed instead)
+  matcher: ["/((?!sign-in|api/auth|api/local-storage|_next|favicon.ico|.*\\.(?:svg|png|jpg|ico)$).*)"],
 };

@@ -10,6 +10,7 @@ export const buttonStyles = cva(
         secondary: "border border-line bg-white text-ink hover:bg-sunk",
         ghost: "text-muted hover:bg-sunk hover:text-ink",
         danger: "text-danger hover:bg-orange-50",
+        "danger-outline": "border border-line bg-white text-error-ink hover:bg-error-50",
       },
       size: {
         sm: "h-8 px-3",

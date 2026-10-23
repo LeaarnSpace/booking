@@ -9,18 +9,23 @@
   "scripts": {
     "dev": "turbo run dev",
     "dev:backoffice": "turbo run dev --filter=@learnspace/backoffice",
+    "dev:booking": "turbo run dev --filter=@learnspace/booking",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "check": "turbo run check",
+    "test": "turbo run test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "verify": "turbo run check lint build && prettier --check .",
-    "db:generate": "npm run db:generate -w @learnspace/auth-staff",
-    "db:migrate": "npm run db:migrate -w @learnspace/auth-staff",
+    "verify": "turbo run check lint test build && prettier --check .",
+    "db:generate": "npm run db:generate -w @learnspace/auth-staff -w @learnspace/bookings",
+    "db:migrate": "npm run db:migrate -w @learnspace/auth-staff -w @learnspace/bookings",
+    "db:migrate:deploy": "node scripts/migrate-on-deploy.mjs",
+    "db:seed": "npm run db:seed -w @learnspace/bookings",
     "db:studio": "npm run db:studio -w @learnspace/auth-staff"
   },
   "devDependencies": {
     "drizzle-orm": "^0.45.4",
+    "postgres": "^3.4.9",
     "prettier": "^3.9.10",
     "turbo": "^2.5.8"
   }

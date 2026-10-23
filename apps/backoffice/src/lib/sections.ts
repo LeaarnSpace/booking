@@ -16,6 +16,8 @@ export interface SectionConfig {
   /** lucide icon name, resolved in the sidebar */
   icon: "globe" | "calendar" | "layout-grid" | "users";
   href: string;
+  /** Sidebar label for `href` when the section has items (default "Overview") */
+  homeLabel?: string;
   items: NavItem[];
 }
 
@@ -35,10 +37,17 @@ export const SECTIONS: SectionConfig[] = [
   {
     id: "bookings",
     label: "Bookings",
-    description: "Bookings, schedules and refunds from the booking platform",
+    description: "Review payments and holds, see the schedule, and manage rooms, customers and revenue",
     icon: "calendar",
     href: "/bookings",
-    items: [],
+    homeLabel: "Bookings",
+    items: [
+      { label: "Schedule", href: "/bookings/schedule" },
+      { label: "Rooms", href: "/bookings/rooms" },
+      { label: "Pricing", href: "/bookings/pricing" },
+      { label: "Customers", href: "/bookings/customers" },
+      { label: "Revenue", href: "/bookings/revenue" },
+    ],
   },
   {
     id: "projects",

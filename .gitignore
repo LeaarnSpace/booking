@@ -10,3 +10,6 @@ dist/
 
 # Private setup notes
 *.local.md
+
+# Files saved by the local storage adapter in development (shared by both apps)
+.storage/

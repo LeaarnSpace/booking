@@ -21,6 +21,17 @@
   --color-line-soft: #e4e5f0;
   --color-danger: #c2410c;
 
+  /* Booking statuses: base colour for borders and fills, -50 for backgrounds, -ink for readable text */
+  --color-pending: #f2a93b;
+  --color-pending-50: #fef6e9;
+  --color-pending-ink: #8a5a00;
+  --color-confirmed: #1f9d63;
+  --color-confirmed-50: #e8f6ef;
+  --color-confirmed-ink: #146c44;
+  --color-error: #e5484d;
+  --color-error-50: #fdeced;
+  --color-error-ink: #b4232a;
+
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;

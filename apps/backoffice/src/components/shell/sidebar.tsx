@@ -39,11 +39,13 @@ export function Sidebar({ sections, onNavigate }: { sections: SectionConfig[]; o
 
       {sections.map((section) => {
         const Icon = ICONS[section.icon];
+        // The section's home stays highlighted on its own sub-pages (e.g. a booking's detail page)
+        const homeActive = isActive(section.href) && !section.items.some((item) => isActive(item.href));
         return (
           <div key={section.id} className="flex flex-col gap-1">
             <p className="px-3 pb-1 text-[11px] font-bold uppercase tracking-[0.08em] text-white/40">{section.label}</p>
-            <NavLink href={section.href} active={pathname === section.href} icon={Icon} onNavigate={onNavigate}>
-              {section.items.length ? "Overview" : section.label}
+            <NavLink href={section.href} active={homeActive} icon={Icon} onNavigate={onNavigate}>
+              {section.items.length ? (section.homeLabel ?? "Overview") : section.label}
             </NavLink>
             {section.items.map((item) => (
               <NavLink key={item.href} href={item.href} active={isActive(item.href)} onNavigate={onNavigate} inset>

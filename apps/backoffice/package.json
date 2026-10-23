@@ -4,13 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 4400",
-    "build": "next build",
+    "build": "npm --prefix ../.. run db:migrate:deploy && next build",
     "start": "next start --port 4400",
     "lint": "eslint .",
     "check": "tsc --noEmit"
   },
   "dependencies": {
     "@learnspace/auth-staff": "*",
+    "@learnspace/bookings": "*",
+    "@learnspace/storage": "*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.59.0",

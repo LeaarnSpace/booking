@@ -1,0 +1,22 @@
+{
+  "name": "@learnspace/storage",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./s3": "./src/s3.ts",
+    "./local": "./src/local.ts",
+    "./memory": "./src/memory.ts",
+    "./factory": "./src/factory.ts",
+    "./testing": "./src/contract.ts"
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "node --experimental-strip-types --disable-warning=ExperimentalWarning --test \"src/**/*.test.ts\""
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5.9.3"
+  }
+}

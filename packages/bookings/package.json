@@ -1,0 +1,26 @@
+{
+  "name": "@learnspace/bookings",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts"
+  },
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/seed-cli.ts",
+    "test": "node --experimental-strip-types --disable-warning=ExperimentalWarning --test \"src/**/*.test.ts\"",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.4",
+    "postgres": "^3.4.9"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "drizzle-kit": "^0.31.11",
+    "typescript": "^5.9.3"
+  }
+}
