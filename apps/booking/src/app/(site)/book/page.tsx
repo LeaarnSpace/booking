@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { listSpaces } from "@learnspace/bookings";
 import { PickHeading } from "@/components/schedule/pick-heading";
 import { Footer } from "@/components/shell/footer";
 import { Container } from "@/components/shell/page";
 import { SiteHeader } from "@/components/shell/site-header";
 import { ResourceCard } from "@/components/ui/resource-card";
+import { listSpaces } from "@/lib/catalog";
 import { photoUrls } from "@/lib/storage";
 import { requireViewer } from "@/lib/viewer";
 

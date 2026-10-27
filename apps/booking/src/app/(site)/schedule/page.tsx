@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { listSchedule, listSpaces } from "@learnspace/bookings";
+import { listSchedule } from "@learnspace/bookings";
 import { addDays, lagosTime } from "@learnspace/bookings/client";
 import { WeekPlanner } from "@/components/schedule/week-planner";
 import { Container } from "@/components/shell/page";
 import { SiteHeader } from "@/components/shell/site-header";
+import { listSpaces } from "@/lib/catalog";
 import { pickDate, weekStart } from "@/lib/schedule";
 import { getViewer } from "@/lib/viewer";
 

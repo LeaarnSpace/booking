@@ -41,6 +41,10 @@ export function createStaffAuth(options: StaffAuthOptions) {
     session: {
       expiresIn: 60 * 60 * 24 * 7, // a week
       updateAge: 60 * 60 * 24, // refreshed daily while in use
+      // A signed copy of the session in a cookie, so most page views don't need a database lookup. A session
+      // ended elsewhere stays usable here for up to 5 minutes; access and the domain are still checked on every
+      // request (see the app's getViewer), so removing someone's roles takes effect at once.
+      cookieCache: { enabled: true, maxAge: 5 * 60 },
     },
     rateLimit: { enabled: true, window: 60, max: 100 },
     user: {

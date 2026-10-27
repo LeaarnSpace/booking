@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getSpace } from "@learnspace/bookings";
 import { Footer } from "@/components/shell/footer";
 import { Container } from "@/components/shell/page";
 import { AvailabilityBar, CommonQuestions, DetailHero, DetailSection, IncludedList } from "@/components/space-detail";
+import { getSpace } from "@/lib/catalog";
 import { photoUrls } from "@/lib/storage";
 import { getViewer } from "@/lib/viewer";
 

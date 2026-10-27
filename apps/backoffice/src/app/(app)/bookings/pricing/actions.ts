@@ -1,10 +1,10 @@
 "use server";
 // Changes from the pricing tables: hourly rates, services, add-ons and length discounts. Each re-checks that
-// the caller can edit Bookings. The booking app reads these on every page, so changes show there at once;
-// bookings already made keep the price they were made at.
-import { revalidatePath } from "next/cache";
+// the caller can edit Bookings. The booking app is told to refresh its cached copy (catalogChanged), so changes
+// show there at once; bookings already made keep the price they were made at.
 import { z } from "zod";
 import { admin } from "@learnspace/bookings";
+import { catalogChanged } from "@/lib/bookings/catalog";
 import type { Result } from "@/lib/bookings/store";
 import { requireSection } from "@/lib/viewer";
 
@@ -13,7 +13,7 @@ const name = z.string().trim().min(2, "Give it a name").max(60);
 const id = z.string().min(1);
 
 function done(result: Result): Result {
-  if (result.ok) revalidatePath("/bookings", "layout");
+  if (result.ok) catalogChanged();
   return result;
 }
 
