@@ -2,6 +2,7 @@
 // checks the person's role before calling these; every change re-checks the record's state inside a
 // transaction, since another staff member may have acted on it first.
 import { and, asc, count, desc, eq, gt, gte, ilike, inArray, lt, ne, or, sql, sum } from "drizzle-orm";
+import { expireHolds as expireAllHolds } from "./bookings.ts";
 import { db } from "./db.ts";
 import {
   includedForServices,
@@ -11,6 +12,7 @@ import {
   setServiceIncluded,
   setSpaceIncluded,
 } from "./included.ts";
+import { queueBookingMessages, type BookingEvent } from "./outbox.ts";
 import { addOn, bookingMessage, bookingTable, lengthDiscount, notification, service, space } from "./schema.ts";
 import {
   type BookingStatus,
@@ -29,13 +31,8 @@ const pgCode = (e: unknown): string | undefined => {
   return err?.code ?? err?.cause?.code;
 };
 
-/** Holds that ran out release their slot (a scheduled job does this too) */
-export async function expireHolds() {
-  await db
-    .update(bookingTable)
-    .set({ status: "expired", decision: { action: "released", by: "Hold ran out", at: new Date().toISOString() } })
-    .where(and(eq(bookingTable.status, "hold"), sql`${bookingTable.holdExpiresAt} <= now()`));
-}
+/** Holds that ran out release their slot (the daily job does this too) */
+export const expireHolds = () => expireAllHolds(db);
 
 /* ---------- Spaces ---------- */
 
@@ -423,13 +420,14 @@ export async function bookingCountsByCustomer(): Promise<Map<string, number>> {
   return new Map(rows.map((r) => [r.id, r.n]));
 }
 
-/** Changes a booking that must currently be in `from`, adding a notification for the customer */
+/** Changes a booking that must currently be in `from`, adding a notification for the customer and its messages */
 async function decide(
   ref: string,
   from: BookingStatus,
   wrongState: string,
   change: (b: typeof bookingTable.$inferSelect) => Partial<typeof bookingTable.$inferInsert>,
   note?: { title: string; body: string },
+  event?: { name: BookingEvent; released?: boolean },
 ): Promise<AdminResult> {
   return db.transaction(async (tx) => {
     const [b] = await tx.select().from(bookingTable).where(eq(bookingTable.ref, ref)).for("update");
@@ -439,6 +437,7 @@ async function decide(
     }
     await tx.update(bookingTable).set(change(b)).where(eq(bookingTable.ref, ref));
     if (note) await tx.insert(notification).values({ customerId: b.customerId, bookingRef: ref, ...note });
+    if (event) await queueBookingMessages(tx, event.name, [ref], { released: event.released });
     return { ok: true };
   });
 }
@@ -450,6 +449,7 @@ export const approveBooking = (ref: string, by: string) =>
     "Only bookings waiting for review can be approved",
     () => ({ status: "confirmed", decision: { action: "approved", by, at: new Date().toISOString() } }),
     { title: "Booking confirmed", body: `Your payment for ${ref} has been verified and your booking is confirmed.` },
+    { name: "confirmed" },
   );
 
 export const declineBooking = (ref: string, by: string, reason: DeclineReason, note?: string) =>
@@ -462,6 +462,7 @@ export const declineBooking = (ref: string, by: string, reason: DeclineReason, n
       title: "Receipt couldn’t be verified",
       body: note || `We couldn't verify the receipt for ${ref}. You can upload a new one from My Bookings.`,
     },
+    { name: "declined" },
   );
 
 export const extendHold = (ref: string, minutes: number) =>
@@ -476,6 +477,7 @@ export const releaseHold = (ref: string, by: string) =>
     "This hold has already ended",
     () => ({ status: "expired", decision: { action: "released", by, at: new Date().toISOString() } }),
     { title: "Hold released", body: `The hold on ${ref} was released, so the slot is free again.` },
+    { name: "hold-ended", released: true },
   );
 
 export async function addStaffMessage(ref: string, author: string, body: string): Promise<AdminResult> {

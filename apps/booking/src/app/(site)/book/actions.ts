@@ -6,6 +6,7 @@ import { z } from "zod";
 import { addOnsLeft, busyIntervals, createBooking, getSpace, updateCustomer } from "@learnspace/bookings";
 import { addDays, closedReason, daySlots, isIsoDate, lagosTime, maxHoursFrom } from "@learnspace/bookings/client";
 import { env } from "@/lib/env";
+import { sendQueuedMessagesSoon } from "@/lib/messages";
 import { getViewer } from "@/lib/viewer";
 
 export interface DayAvailability {
@@ -81,6 +82,7 @@ export async function submitBooking(input: BookingInput): Promise<{ error: strin
     holdMinutes: env.holdMinutes,
   });
   if (!result.ok) return { error: result.error };
+  sendQueuedMessagesSoon();
   // Remember the phone number for next time
   if (data.phone && data.phone !== viewer.phone) await updateCustomer(viewer.id, { phone: data.phone });
   redirect(result.status === "hold" ? `/bookings/${result.ref}/pay` : `/bookings/${result.ref}?done=confirmed`);

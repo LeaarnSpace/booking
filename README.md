@@ -10,7 +10,8 @@ packages/
   auth-staff/      Staff identities and back-office access ("backoffice" schema)
   auth-customers/  Customer sign-in (Google or emailed code); holds no data, the app passes its tables in
   bookings/        Customers, spaces, prices, bookings and notifications ("booking" schema)
-  email/           Sending email, with one adapter per provider (Brevo, Mailpit, console)
+  email/           Sending email, with one adapter per provider (Gmail, Brevo, Mailpit, console), and templates
+  chat/            Team chat posts, with one adapter per provider (Slack webhook, console)
   storage/         File storage, with one adapter per provider (S3/R2, local disk, memory)
 ```
 

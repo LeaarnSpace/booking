@@ -13,6 +13,8 @@ const minutes = (value: string | undefined, fallback: number) => {
 export const env = {
   production: process.env.NODE_ENV === "production",
   appUrl: process.env.BETTER_AUTH_URL ?? "http://localhost:4500",
+  /** The back office, for links in Slack messages (optional) */
+  backofficeUrl: process.env.BACKOFFICE_URL || (process.env.NODE_ENV === "production" ? "" : "http://localhost:4400"),
   google:
     process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
       ? { clientId: process.env.GOOGLE_CLIENT_ID, clientSecret: process.env.GOOGLE_CLIENT_SECRET }
@@ -26,6 +28,11 @@ export const env = {
    * without EMAIL_DRIVER, emailed sign-in codes are switched off and customers sign in with Google only.
    */
   email: process.env.NODE_ENV !== "production" || Boolean(process.env.EMAIL_DRIVER),
+  /**
+   * How many more times to try a message that failed (default 0: it's kept as failed in the back office).
+   * Retries only happen when the app is sending anyway, after a later booking change; nothing runs on a schedule.
+   */
+  messageRetries: Math.min(Math.max(Math.trunc(Number(process.env.MESSAGE_RETRIES) || 0), 0), 7),
   /** Sender for sign-in codes and booking emails */
   mailFrom: {
     email: process.env.EMAIL_FROM_ADDRESS || "bookings@learnspace.com.ng",

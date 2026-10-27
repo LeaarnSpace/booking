@@ -4,7 +4,7 @@
 // show there at once; bookings already made keep the price they were made at.
 import { z } from "zod";
 import { admin } from "@learnspace/bookings";
-import { catalogChanged } from "@/lib/bookings/catalog";
+import { catalogChanged } from "@/lib/booking-app";
 import type { Result } from "@/lib/bookings/store";
 import { requireSection } from "@/lib/viewer";
 

@@ -4,6 +4,7 @@
 import { and, asc, desc, eq, gt, inArray, lt, lte, sql } from "drizzle-orm";
 import { canBook, type Interval } from "./availability.ts";
 import { db, type BookingDatabase } from "./db.ts";
+import { queueBookingMessages } from "./outbox.ts";
 import { priceBooking } from "./pricing.ts";
 import { addOn, bookingAddOn, bookingTable, lengthDiscount, notification, service, space } from "./schema.ts";
 import { lagosIsoDate } from "./time.ts";
@@ -19,9 +20,12 @@ const pgCode = (e: unknown): string | undefined => {
   return err?.code ?? err?.cause?.code;
 };
 
-/** Holds that ran out release their slot. Runs before anything that depends on availability. */
-async function expireHolds(tx: Tx | BookingDatabase, spaceId?: string) {
-  await tx
+/**
+ * Holds that ran out release their slot, and their customers hear about it. Runs before anything that depends
+ * on availability, and in the daily job.
+ */
+export async function expireHolds(tx: Tx | BookingDatabase, spaceId?: string) {
+  const expired = await tx
     .update(bookingTable)
     .set({ status: "expired", decision: { action: "released", by: "Hold ran out", at: new Date().toISOString() } })
     .where(
@@ -30,7 +34,13 @@ async function expireHolds(tx: Tx | BookingDatabase, spaceId?: string) {
         lte(bookingTable.holdExpiresAt, sql`now()`),
         spaceId ? eq(bookingTable.spaceId, spaceId) : undefined,
       ),
-    );
+    )
+    .returning({ ref: bookingTable.ref });
+  await queueBookingMessages(
+    tx,
+    "hold-ended",
+    expired.map((b) => b.ref),
+  );
 }
 
 /** Time ranges already taken in a space between `from` and `to` */
@@ -257,6 +267,7 @@ export async function createBooking(input: NewBooking): Promise<Result<{ ref: st
           if (status === "confirmed") {
             await notify(tx, input.customer.id, ref, "Booking confirmed", `Your booking ${ref} is confirmed.`);
           }
+          await queueBookingMessages(tx, status === "confirmed" ? "confirmed" : "requested", [ref]);
           return { ok: true, ref, status } as const;
         } catch (e) {
           // Ref already used: try another number
@@ -401,6 +412,7 @@ export async function submitReceipt(customerId: string, ref: string, receipt: Re
       "Receipt received",
       `We've got your receipt for ${ref} and will check it shortly.`,
     );
+    await queueBookingMessages(tx, "receipt-uploaded", [ref]);
     return { ok: true };
   });
 }
@@ -421,6 +433,7 @@ export async function retryPayment(customerId: string, ref: string, holdMinutes:
         .update(bookingTable)
         .set({ status: "hold", receipt: null, holdExpiresAt: new Date(Date.now() + holdMinutes * 60_000) })
         .where(eq(bookingTable.ref, ref));
+      await queueBookingMessages(tx, "requested", [ref]);
       return { ok: true };
     });
   } catch (e) {
@@ -446,6 +459,7 @@ export async function cancelBooking(customerId: string, ref: string, reason: str
       .set({ status: "cancelled", cancelledAt: new Date(), cancelReason: reason.slice(0, 300) })
       .where(eq(bookingTable.ref, ref));
     await notify(tx, customerId, ref, "Booking cancelled", `Your booking ${ref} has been cancelled.`);
+    await queueBookingMessages(tx, "cancelled", [ref]);
     return { ok: true };
   });
 }

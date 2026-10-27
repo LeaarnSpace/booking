@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { cancelBooking, getCustomerBooking, retryPayment, submitReceipt } from "@learnspace/bookings";
 import { CANCEL_REASONS, MAX_RECEIPT_BYTES, RECEIPT_TYPES } from "@learnspace/bookings/client";
 import { env } from "@/lib/env";
+import { sendQueuedMessagesSoon } from "@/lib/messages";
 import { receiptStorage } from "@/lib/storage";
 import { getViewer } from "@/lib/viewer";
 
@@ -64,6 +65,7 @@ export async function confirmReceipt(ref: string, key: string, fileName: string)
     await storage.delete(key);
     return result;
   }
+  sendQueuedMessagesSoon();
   revalidatePath("/bookings", "layout");
   return { ok: true };
 }
@@ -73,6 +75,7 @@ export async function retry(ref: string): Promise<Result> {
   if (!viewer) return { ok: false, error: "Please log in again" };
   const result = await retryPayment(viewer.id, ref, env.holdMinutes);
   if (!result.ok) return result;
+  sendQueuedMessagesSoon();
   redirect(`/bookings/${ref}/pay`);
 }
 
@@ -85,6 +88,7 @@ export async function cancel(ref: string, _: Result | null, form: FormData): Pro
   if (reason === "Other" && other.length < 3) return { ok: false, error: "Tell us briefly why you're cancelling" };
   const result = await cancelBooking(viewer.id, ref, reason === "Other" ? `Other: ${other}` : reason);
   if (!result.ok) return result;
+  sendQueuedMessagesSoon();
   revalidatePath("/bookings", "layout");
   redirect(`/bookings/${ref}?done=cancelled`);
 }

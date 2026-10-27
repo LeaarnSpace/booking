@@ -27,6 +27,8 @@ import {
   type DayHours,
   type Decision,
   type Faq,
+  type MessageId,
+  type MessagePayload,
   type Photo,
   type PriceBreakdown,
   type Receipt,
@@ -343,4 +345,51 @@ export const notificationSettings = booking.table("notification_settings", {
   cancellations: boolean("cancellations").notNull().default(true),
   paymentUpdates: boolean("payment_updates").notNull().default(true),
   ...timestamps,
+});
+
+/* ---------- Outgoing emails and Slack posts ---------- */
+
+/**
+ * Messages waiting to be sent. Each is queued in the same transaction as the change it's about, so a booking
+ * change and its messages are saved together or not at all; they're sent straight after, and retried later if
+ * that fails (see outbox.ts).
+ */
+export const outbox = booking.table(
+  "outbox",
+  {
+    id: serial("id").primaryKey(),
+    /** Unique per message, so queuing the same one twice (a cron run that repeats) does nothing */
+    key: text("key").notNull().unique(),
+    message: text("message").$type<MessageId>().notNull(),
+    payload: jsonb("payload").$type<MessagePayload>().notNull(),
+    /** skipped: switched off, or no provider set up, by the time it was due */
+    status: text("status", { enum: ["pending", "sent", "failed", "skipped"] })
+      .notNull()
+      .default("pending"),
+    attempts: integer("attempts").notNull().default(0),
+    nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true }).notNull().defaultNow(),
+    /** Set while one sender is working on it, so two can't send the same message */
+    lockedUntil: timestamp("locked_until", { withTimezone: true }),
+    lastError: text("last_error"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+  },
+  (t) => [
+    index("outbox_due_idx")
+      .on(t.nextAttemptAt)
+      .where(sql`${t.status} = 'pending'`),
+    index("outbox_created_idx").on(t.createdAt),
+  ],
+);
+
+/** Messages staff have switched on or off in the back office; a message with no row is on */
+export const messageSetting = booking.table("message_setting", {
+  id: text("id").$type<MessageId>().primaryKey(),
+  enabled: boolean("enabled").notNull(),
+  /** Staff email of whoever changed it last */
+  updatedBy: text("updated_by"),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });

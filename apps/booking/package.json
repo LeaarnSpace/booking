@@ -12,6 +12,7 @@
   "dependencies": {
     "@learnspace/auth-customers": "*",
     "@learnspace/bookings": "*",
+    "@learnspace/chat": "*",
     "@learnspace/email": "*",
     "@learnspace/storage": "*",
     "class-variance-authority": "^0.7.1",

@@ -5,10 +5,12 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./gmail": "./src/gmail.ts",
     "./brevo": "./src/brevo.ts",
     "./mailpit": "./src/mailpit.ts",
     "./console": "./src/console.ts",
     "./memory": "./src/memory.ts",
+    "./backup": "./src/backup.ts",
     "./factory": "./src/factory.ts",
     "./templates": "./src/templates/index.ts",
     "./testing": "./src/contract.ts"
