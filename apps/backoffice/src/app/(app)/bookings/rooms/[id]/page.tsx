@@ -26,7 +26,11 @@ const DONE: Record<string, string> = {
 export default async function EditRoomPage({ params, searchParams }: Props) {
   await requireSection("bookings", "editor");
   const [{ id }, { done }] = await Promise.all([params, searchParams]);
-  const [room, services] = await Promise.all([getRoom(id), admin.listServicesFor(id)]);
+  const [room, services, suggestions] = await Promise.all([
+    getRoom(id),
+    admin.listServicesFor(id),
+    admin.listIncludedItems(),
+  ]);
   if (!room) notFound();
   const storage = await mediaStorage();
   const photos = await Promise.all(
@@ -114,7 +118,7 @@ export default async function EditRoomPage({ params, searchParams }: Props) {
       <RoomForm
         key={JSON.stringify(details)}
         room={details}
-        suggestions={await admin.listIncludedItems()}
+        suggestions={suggestions}
         action={saveRoom.bind(null, room.id)}
         submitLabel="Save changes"
       />

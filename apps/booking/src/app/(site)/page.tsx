@@ -1,4 +1,3 @@
-import { listSpaces } from "@learnspace/bookings";
 import { HeroGallery } from "@/components/hero-gallery";
 import { Footer } from "@/components/shell/footer";
 import { Container } from "@/components/shell/page";
@@ -6,6 +5,7 @@ import { SiteHeader } from "@/components/shell/site-header";
 import { ButtonLink } from "@/components/ui/button";
 import { FaqList } from "@/components/ui/faq";
 import { ResourceCard } from "@/components/ui/resource-card";
+import { listSpaces } from "@/lib/catalog";
 import { GENERAL_FAQS, HOW_TO_BOOK } from "@/lib/content";
 import { photoUrls } from "@/lib/storage";
 import { getViewer } from "@/lib/viewer";

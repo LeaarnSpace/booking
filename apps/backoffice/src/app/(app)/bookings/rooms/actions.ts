@@ -2,10 +2,10 @@
 // Room changes, service details, and photos for both. Every action re-checks that the caller is at least an editor of Bookings.
 // Photos go straight from the browser to media storage: the server signs an upload link for one file of a
 // given type and size, then checks the stored file before adding it to the room.
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { admin } from "@learnspace/bookings";
+import { catalogChanged } from "@/lib/bookings/catalog";
 import * as store from "@/lib/bookings/store";
 import { MAX_PHOTO_BYTES, PHOTO_TYPES } from "@/lib/bookings/types";
 import { mediaStorage } from "@/lib/storage";
@@ -83,7 +83,7 @@ export async function saveRoom(roomId: string | null, _: Result | null, form: Fo
     if (!result.ok) return result;
     roomId = result.id;
   }
-  revalidatePath("/bookings", "layout");
+  catalogChanged();
   redirect(`/bookings/rooms/${roomId}?done=${form.get("isNew") ? "created" : "saved"}`);
 }
 
@@ -138,7 +138,7 @@ export async function confirmPhotoUpload(owner: PhotoOwner, key: string, alt: st
     await storage.delete(key);
     return result;
   }
-  revalidatePath("/bookings", "layout");
+  catalogChanged();
   return { ok: true };
 }
 
@@ -149,7 +149,7 @@ export async function deletePhoto(owner: PhotoOwner, key: string): Promise<Resul
   await (await mediaStorage()).delete(key);
   const result =
     owner.kind === "room" ? await store.removeRoomPhoto(owner.id, key) : await admin.removeServicePhoto(owner.id, key);
-  if (result.ok) revalidatePath("/bookings", "layout");
+  if (result.ok) catalogChanged();
   return result;
 }
 
@@ -157,7 +157,7 @@ export async function makeCover(owner: PhotoOwner, key: string): Promise<Result>
   await requireSection("bookings", "editor");
   const result =
     owner.kind === "room" ? await store.makeCoverPhoto(owner.id, key) : await admin.makeServiceCover(owner.id, key);
-  if (result.ok) revalidatePath("/bookings", "layout");
+  if (result.ok) catalogChanged();
   return result;
 }
 
@@ -202,6 +202,6 @@ export async function saveServiceDetails(
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
   const result = await admin.updateServiceDetails(serviceId, parsed.data);
   if (!result.ok) return result;
-  revalidatePath("/bookings", "layout");
+  catalogChanged();
   redirect(`/bookings/rooms/${roomId}/services/${serviceId}?done=saved`);
 }

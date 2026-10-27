@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getSpace } from "@learnspace/bookings";
 import { lagosIsoDate } from "@learnspace/bookings/client";
 import { PickHeading } from "@/components/schedule/pick-heading";
 import { BackButton, Container } from "@/components/shell/page";
 import { SiteHeader } from "@/components/shell/site-header";
 import { ResourceCard } from "@/components/ui/resource-card";
+import { getSpace } from "@/lib/catalog";
 import { photoUrls } from "@/lib/storage";
 import { requireViewer } from "@/lib/viewer";
 import { getDayAvailability } from "../actions";

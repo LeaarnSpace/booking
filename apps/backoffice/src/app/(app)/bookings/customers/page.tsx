@@ -18,9 +18,9 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
   await requireSection("bookings");
   const params = await searchParams;
   const q = params.q?.trim() ?? "";
-  const customers = await listCustomers(q);
-  const selectedId = params.c ?? customers[0]?.id;
-  const selected = selectedId ? await getCustomer(selectedId) : null;
+  // A customer picked from the list loads alongside it; otherwise the first in the list is shown
+  const [customers, picked] = await Promise.all([listCustomers(q), params.c ? getCustomer(params.c) : null]);
+  const selected = params.c ? picked : customers[0] ? await getCustomer(customers[0].id) : null;
   const href = (id: string) => `/bookings/customers?${new URLSearchParams({ c: id, ...(q && { q }) })}#customer`;
 
   return (

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { catalogChanged } from "@/lib/bookings/catalog";
 import * as store from "@/lib/bookings/store";
 import { DECLINE_REASONS, type DeclineReason } from "@/lib/bookings/types";
 import { env } from "@/lib/env";
@@ -78,6 +79,6 @@ export async function setRoomVisibility(input: { roomId: string; visibility: str
   const parsed = z.object({ roomId: z.string().min(1), visibility: z.enum(["everyone", "staff"]) }).safeParse(input);
   if (!parsed.success) return { ok: false, error: "Unknown room" };
   const result = await store.setRoomVisibility(parsed.data.roomId, parsed.data.visibility);
-  if (result.ok) revalidatePath("/bookings", "layout");
+  if (result.ok) catalogChanged();
   return result;
 }
