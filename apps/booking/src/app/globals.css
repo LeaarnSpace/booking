@@ -44,6 +44,19 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
+/* Tailwind 4 leaves buttons with the arrow cursor; show the hand on anything clickable */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary,
+  select:not(:disabled),
+  input:is([type="checkbox"], [type="radio"], [type="submit"], [type="file"]):not(:disabled) {
+    cursor: pointer;
+  }
+  :disabled {
+    cursor: not-allowed;
+  }
+}
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;

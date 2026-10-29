@@ -1,7 +1,7 @@
 // Emails to customers about their bookings. Each takes the booking as it was when the email was queued and
 // the links to use, and returns { subject, text, html }.
 import type { Brand } from "./brand.ts";
-import { button, details, heading, layout, paragraph, textBody } from "./layout.ts";
+import { button, details, heading, layout, linkLine, paragraph, textBody } from "./layout.ts";
 
 export interface BookingSummary {
   ref: string;
@@ -94,7 +94,8 @@ function compose({
   lines: string[];
   rows: [string, string][];
   action?: { label: string; url: string };
-  after?: string[];
+  /** Closing lines; a line with links shows them as text links (and as "label: url" in the text version) */
+  after?: (string | { text: string; links: { label: string; url: string }[] })[];
 }) {
   const html = layout({
     brand,
@@ -106,7 +107,7 @@ function compose({
       ...lines.map(paragraph),
       details(brand, rows),
       action ? button(brand, action.label, action.url) : "",
-      ...after.map(paragraph),
+      ...after.map((a) => (typeof a === "string" ? paragraph(a) : linkLine(brand, a.text, a.links))),
     ].join("\n        "),
   });
   const text = textBody(brand, [
@@ -117,7 +118,9 @@ function compose({
     "",
     action && `${action.label}: ${action.url}`,
     action && "",
-    ...after.flatMap((l) => [l, ""]),
+    ...after.flatMap((a) =>
+      typeof a === "string" ? [a, ""] : [a.text, ...a.links.map((l) => `${l.label}: ${l.url}`), ""],
+    ),
   ]);
   return { subject, text: text.replace(/\n{3,}/g, "\n\n"), html };
 }
@@ -167,7 +170,9 @@ export function receiptReceivedEmail(input: Base & { bookingUrl: string }) {
   });
 }
 
-export function bookingConfirmedEmail(input: Base & { bookingUrl: string; calendarUrl: string; address: string }) {
+export function bookingConfirmedEmail(
+  input: Base & { bookingUrl: string; calendarUrl: string; googleCalendarUrl?: string; address: string },
+) {
   const { brand, booking } = input;
   return compose({
     brand,
@@ -178,7 +183,18 @@ export function bookingConfirmedEmail(input: Base & { bookingUrl: string; calend
     lines: ["Everything's set. Here are your booking details."],
     rows: [...summaryRows(brand, booking), ...(input.address ? [["Where", input.address] as [string, string]] : [])],
     action: { label: "View your booking", url: input.bookingUrl },
-    after: [`Add it to your calendar: ${input.calendarUrl}`],
+    after: [
+      {
+        text: "Add it to your calendar:",
+        links: [
+          ...(input.googleCalendarUrl ? [{ label: "Google Calendar", url: input.googleCalendarUrl }] : []),
+          {
+            label: input.googleCalendarUrl ? "Apple, Outlook and others" : "Download the event",
+            url: input.calendarUrl,
+          },
+        ],
+      },
+    ],
   });
 }
 

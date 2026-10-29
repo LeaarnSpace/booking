@@ -262,9 +262,14 @@ describe("booking templates", () => {
       booking,
       bookingUrl: "https://book.example.com/bookings/LS-0311-4821",
       calendarUrl: "https://book.example.com/bookings/LS-0311-4821/calendar",
+      googleCalendarUrl: "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Video",
       address: "38, Diya Street, Gbagada, Lagos",
     });
     assert.match(email.subject, /^Booking confirmed: Video Podcast · Creative <Space>, Tuesday 3 November/);
     assert.ok(email.text.includes("Where: 38, Diya Street, Gbagada, Lagos"));
+    assert.ok(
+      email.text.includes("Google Calendar: https://calendar.google.com/calendar/render?action=TEMPLATE&text=Video"),
+    );
+    assert.ok(email.html.includes('href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Video"'));
   });
 });
