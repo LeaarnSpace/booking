@@ -173,3 +173,124 @@ export const NOTIFICATION_SETTINGS = [
   { id: "paymentUpdates", label: "Payment updates" },
 ] as const;
 export type NotificationSetting = (typeof NOTIFICATION_SETTINGS)[number]["id"];
+
+/**
+ * Emails to customers and Slack posts to staff. Staff switch each one on or off in the back office. Customers get
+ * only the booking confirmation by default (staff handle the rest of the conversation by email themselves); the
+ * others stay off, and out of the customer's own settings, until staff switch them on. Customer emails also follow
+ * that customer's own setting (`customerSetting`).
+ */
+export const MESSAGES = [
+  {
+    id: "email.requested",
+    channel: "email",
+    label: "Slot held: payment details",
+    description: "Amount, bank details and the upload link, and when the hold runs out",
+    customerSetting: "paymentUpdates",
+    defaultEnabled: false,
+  },
+  {
+    id: "email.receipt-received",
+    channel: "email",
+    label: "Receipt received",
+    description: "We've got the receipt and will check it",
+    customerSetting: "paymentUpdates",
+    defaultEnabled: false,
+  },
+  {
+    id: "email.confirmed",
+    channel: "email",
+    label: "Booking confirmed",
+    description: "Payment approved, or a staff booking: details, address and a calendar link",
+    customerSetting: "confirmations",
+    defaultEnabled: true,
+  },
+  {
+    id: "email.declined",
+    channel: "email",
+    label: "Payment declined",
+    description: "Why the receipt was declined, and a link to try again",
+    customerSetting: "paymentUpdates",
+    defaultEnabled: false,
+  },
+  {
+    id: "email.cancelled",
+    channel: "email",
+    label: "Booking cancelled",
+    description: "When the customer cancels",
+    customerSetting: "cancellations",
+    defaultEnabled: false,
+  },
+  {
+    id: "email.hold-ended",
+    channel: "email",
+    label: "Hold ended",
+    description: "The hold ran out before a receipt arrived, or staff released it",
+    customerSetting: "cancellations",
+    defaultEnabled: false,
+  },
+  {
+    id: "slack.requested",
+    channel: "slack",
+    label: "New booking request",
+    description: "A customer is holding a slot (before paying)",
+    customerSetting: null,
+    defaultEnabled: true,
+  },
+  {
+    id: "slack.receipt-uploaded",
+    channel: "slack",
+    label: "Receipt to review",
+    description: "A receipt was uploaded and needs checking",
+    customerSetting: null,
+    defaultEnabled: true,
+  },
+  {
+    id: "slack.cancelled",
+    channel: "slack",
+    label: "Cancellation",
+    description: "A customer cancelled, freeing the slot",
+    customerSetting: null,
+    defaultEnabled: true,
+  },
+  {
+    id: "slack.hold-ended",
+    channel: "slack",
+    label: "Hold ran out",
+    description: "No receipt arrived in time, so the slot is free again",
+    customerSetting: null,
+    defaultEnabled: true,
+  },
+] as const satisfies readonly {
+  id: string;
+  channel: "email" | "slack";
+  label: string;
+  description: string;
+  customerSetting: NotificationSetting | null;
+  defaultEnabled: boolean;
+}[];
+export type MessageId = (typeof MESSAGES)[number]["id"];
+
+/** A booking as it was when a message about it was queued */
+export interface BookingSnapshot {
+  ref: string;
+  space: string;
+  service: string | null;
+  /** ISO times */
+  start: string;
+  end: string;
+  amount: number;
+  holdExpiresAt: string | null;
+}
+
+/** Everything needed to write a queued message, so sending doesn't depend on the booking's current state */
+export interface MessagePayload {
+  /** For customer emails */
+  to: { email: string; name: string };
+  booking: BookingSnapshot;
+  /** Declined: the reason's label and staff's note */
+  reason?: string;
+  note?: string | null;
+  /** Hold ended: released by staff rather than run out */
+  released?: boolean;
+}

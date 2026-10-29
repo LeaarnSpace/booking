@@ -37,3 +37,13 @@ export {
   updateCustomer,
   type Customer,
 } from "./customers.ts";
+export {
+  customerEmailChoices,
+  deliverOutbox,
+  discardMessage,
+  getMessageSettings,
+  listFailedMessages,
+  retryMessage,
+  setMessageSetting,
+  type QueuedMessage,
+} from "./outbox.ts";

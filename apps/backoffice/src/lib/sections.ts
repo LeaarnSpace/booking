@@ -47,6 +47,7 @@ export const SECTIONS: SectionConfig[] = [
       { label: "Pricing", href: "/bookings/pricing" },
       { label: "Customers", href: "/bookings/customers" },
       { label: "Revenue", href: "/bookings/revenue" },
+      { label: "Notifications", href: "/bookings/notifications" },
     ],
   },
   {

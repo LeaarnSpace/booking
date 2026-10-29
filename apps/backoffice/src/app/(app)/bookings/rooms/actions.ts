@@ -5,7 +5,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { admin } from "@learnspace/bookings";
-import { catalogChanged } from "@/lib/bookings/catalog";
+import { catalogChanged } from "@/lib/booking-app";
 import * as store from "@/lib/bookings/store";
 import { MAX_PHOTO_BYTES, PHOTO_TYPES } from "@/lib/bookings/types";
 import { mediaStorage } from "@/lib/storage";

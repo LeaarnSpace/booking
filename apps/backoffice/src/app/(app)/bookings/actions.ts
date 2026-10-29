@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { catalogChanged } from "@/lib/bookings/catalog";
+import { catalogChanged, messagesQueued } from "@/lib/booking-app";
 import * as store from "@/lib/bookings/store";
 import { DECLINE_REASONS, type DeclineReason } from "@/lib/bookings/types";
 import { env } from "@/lib/env";
@@ -23,6 +23,7 @@ export async function approveBooking(bookingRef: string): Promise<Result> {
   if (!ref.safeParse(bookingRef).success) return { ok: false, error: "Unknown booking" };
   const result = await store.approveBooking(bookingRef, me.name);
   if (!result.ok) return result;
+  messagesQueued();
   done(bookingRef, "approved");
 }
 
@@ -45,6 +46,7 @@ export async function declineBooking(bookingRef: string, _: Result | null, form:
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
   const result = await store.declineBooking(bookingRef, me.name, parsed.data.reason, parsed.data.note);
   if (!result.ok) return result;
+  messagesQueued();
   done(bookingRef, "declined");
 }
 
@@ -61,6 +63,7 @@ export async function releaseHold(bookingRef: string): Promise<Result> {
   if (!ref.safeParse(bookingRef).success) return { ok: false, error: "Unknown booking" };
   const result = await store.releaseHold(bookingRef, me.name);
   if (!result.ok) return result;
+  messagesQueued();
   done(bookingRef, "released");
 }
 

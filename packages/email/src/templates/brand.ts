@@ -9,6 +9,10 @@ export interface Brand {
   /** Footer line, e.g. "Learn Space Limited · Lagos, Nigeria" */
   footer: string;
   colors: { header: string; accent: string; accentTint: string };
+  /** Times in emails are shown in this zone, e.g. "Africa/Lagos" */
+  timeZone: string;
+  /** Prices are in this currency, e.g. "NGN" */
+  currency: string;
 }
 
 export const learnSpaceBrand: Brand = {
@@ -16,6 +20,8 @@ export const learnSpaceBrand: Brand = {
   product: "Bookings",
   footer: "Learn Space Limited · Lagos, Nigeria",
   colors: { header: "#0e1b34", accent: "#004bad", accentTint: "#eaf1fb" },
+  timeZone: "Africa/Lagos",
+  currency: "NGN",
 };
 
 /** Escapes text for HTML email bodies */
