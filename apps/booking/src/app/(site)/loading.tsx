@@ -6,7 +6,7 @@ import { Logo } from "@/components/ui/logo";
 export default function Loading() {
   return (
     <div aria-busy="true" aria-label="Loading">
-      <header className="w-full bg-sunk md:bg-white">
+      <header className="sticky top-0 z-30 w-full bg-sunk md:bg-white">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-4 pb-4 pt-6 md:px-20 md:py-5">
           <Logo />
           <div className="h-[42px] w-32 animate-pulse rounded-full bg-line" />

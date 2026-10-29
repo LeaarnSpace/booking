@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/shell/footer";
 import { Container } from "@/components/shell/page";
+import { SiteHeader } from "@/components/shell/site-header";
 import { AvailabilityBar, CommonQuestions, DetailHero, DetailSection, IncludedList } from "@/components/space-detail";
 import { getSpace } from "@/lib/catalog";
 import { photoUrls } from "@/lib/storage";
@@ -29,6 +30,7 @@ export default async function ServicePage({ params }: Props) {
 
   return (
     <>
+      <SiteHeader />
       <main className="pb-24 md:pb-16">
         <DetailHero title={service.name} visibility={space.visibility} photos={photos} back={`/spaces/${space.id}`} />
         <Container className="flex flex-col gap-6 pt-6 md:gap-12 md:pt-14">

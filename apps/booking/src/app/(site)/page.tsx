@@ -25,7 +25,7 @@ export default async function Home() {
     <>
       <SiteHeader overlay />
       <main>
-        <section className="relative flex h-[min(100svh,932px)] min-h-[560px] items-end md:mt-[120px] md:h-[556px] md:min-h-0 md:items-center">
+        <section className="relative flex h-svh min-h-[560px] items-end md:min-h-[640px] md:items-center md:pt-[120px]">
           <HeroGallery photos={HERO} />
           <Container className="relative pb-24 md:pb-0">
             <div className="flex max-w-[576px] flex-col gap-12">
@@ -44,7 +44,7 @@ export default async function Home() {
           </Container>
         </section>
 
-        <section id="spaces" className="scroll-mt-20 bg-blue-100 py-12 md:py-14">
+        <section id="spaces" data-header-solid className="scroll-mt-24 bg-blue-100 py-12 md:scroll-mt-[120px] md:py-14">
           <Container className="flex flex-col gap-12">
             <div className="flex flex-col gap-3 text-ink">
               <h2 className="text-2xl font-bold tracking-[0.012em]">Available Spaces</h2>

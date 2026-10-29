@@ -65,12 +65,20 @@ function writeEmail(id: MessageId, p: QueuedMessage["payload"]) {
   }
 }
 
-/** Slack posts carry the booking reference, space, time and amount, but no names, emails or phone numbers */
+/**
+ * Slack posts carry the booking reference, space, time and amount, but no customer names, emails or phone
+ * numbers. Staff bookings name the staff member, who isn't a customer.
+ */
 function writeChat(id: MessageId, payload: QueuedMessage["payload"]): ChatMessage {
   const b = payload.booking;
   const what = b.service ? `${b.service} · ${b.space}` : b.space;
   const link = backofficeLink(`/bookings/${b.ref}`);
-  const lines = [what, formatSlot(brand, b), ...(b.amount ? [formatAmount(brand, b.amount)] : [])];
+  const lines = [
+    what,
+    formatSlot(brand, b),
+    ...(b.amount ? [formatAmount(brand, b.amount)] : []),
+    ...(b.staff ? [`Staff booking: ${payload.to.name}`] : []),
+  ];
   const titles: Partial<Record<MessageId, string>> = {
     "slack.requested": `New booking request: ${b.ref}`,
     "slack.receipt-uploaded": `Receipt to review: ${b.ref}`,
