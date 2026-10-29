@@ -1,6 +1,7 @@
 "use client";
-import { startTransition, useActionState, useState } from "react";
+import { startTransition, useActionState, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -13,15 +14,17 @@ export function CancelForm({
 }) {
   const [state, run, pending] = useActionState(action, null);
   const [reason, setReason] = useState("");
+  // The filled-in form, kept while the customer confirms in the dialog
+  const pendingForm = useRef<FormData | null>(null);
+  const [asking, setAsking] = useState(false);
 
   return (
     <form
       className="mx-auto flex max-w-[760px] flex-col gap-6"
       onSubmit={(e) => {
         e.preventDefault();
-        if (!confirm("Cancel this booking? The slot will be released.")) return;
-        const data = new FormData(e.currentTarget);
-        startTransition(() => run(data));
+        pendingForm.current = new FormData(e.currentTarget);
+        setAsking(true);
       }}
     >
       <fieldset className="flex flex-col">
@@ -69,6 +72,19 @@ export function CancelForm({
           {pending ? "Cancelling…" : "Confirm"}
         </Button>
       </div>
+      <ConfirmDialog
+        open={asking}
+        title="Cancel this booking?"
+        message="Your slot will be released and someone else can book it. This can't be undone."
+        confirmLabel="Yes, cancel booking"
+        cancelLabel="Keep booking"
+        onClose={() => setAsking(false)}
+        onConfirm={() => {
+          setAsking(false);
+          const data = pendingForm.current;
+          if (data) startTransition(() => run(data));
+        }}
+      />
     </form>
   );
 }
