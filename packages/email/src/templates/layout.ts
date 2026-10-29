@@ -80,6 +80,15 @@ export const heading = (text: string) =>
 export const paragraph = (text: string) =>
   `<p style="margin:0 0 16px;font-family:${FONT};font-size:15px;line-height:24px;color:${C.muted}">${esc(text)}</p>`;
 
+/** A line of text followed by links, e.g. "Add it to your calendar: Google Calendar · Other calendars" */
+export const linkLine = (brand: Brand, text: string, links: { label: string; url: string }[]) =>
+  `<p style="margin:0 0 16px;font-family:${FONT};font-size:15px;line-height:24px;color:${C.muted}">${esc(text)} ${links
+    .map(
+      (l) =>
+        `<a href="${esc(l.url)}" style="color:${brand.colors.accent};font-weight:600;text-decoration:underline">${esc(l.label)}</a>`,
+    )
+    .join(" · ")}</p>`;
+
 /** Label/value rows in a tinted box, e.g. the booking's date, place and amount */
 export const details = (brand: Brand, rows: [label: string, value: string][]) =>
   `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${brand.colors.accentTint};border-radius:14px;margin:8px 0 24px">

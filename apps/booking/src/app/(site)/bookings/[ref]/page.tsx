@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getCustomerBooking, type CustomerBooking } from "@learnspace/bookings";
 import { DECLINE_REASONS } from "@learnspace/bookings/client";
+import { AddToCalendar } from "@/components/booking/add-to-calendar";
 import { StatusBadge } from "@/components/booking/status";
 import { Container, PageTitle } from "@/components/shell/page";
 import { SiteHeader } from "@/components/shell/site-header";
@@ -49,15 +50,9 @@ export default async function BookingPage({ params, searchParams }: Props) {
             {b.status !== "declined" && (
               <div className="flex flex-wrap gap-4">
                 {b.status === "confirmed" && (
-                  <a
-                    href={`/bookings/${b.ref}/calendar`}
-                    className="flex h-11 flex-1 items-center justify-center gap-2 rounded-md border border-line bg-white text-base text-ink hover:bg-sunk"
-                  >
-                    Add to Calendar{" "}
-                    <span aria-hidden className="text-xl">
-                      +
-                    </span>
-                  </a>
+                  <AddToCalendar
+                    booking={{ ref: b.ref, space: b.spaceName, service: b.serviceName, start: b.start, end: b.end }}
+                  />
                 )}
                 <ButtonLink href="/schedule" className="flex-1">
                   Back to schedule

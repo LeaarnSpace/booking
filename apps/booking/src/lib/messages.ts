@@ -18,6 +18,7 @@ import {
   learnSpaceBrand as brand,
   receiptReceivedEmail,
 } from "@learnspace/email/templates";
+import { googleCalendarUrl } from "./calendar";
 import { getSender } from "./email";
 import { env } from "./env";
 
@@ -45,6 +46,7 @@ function writeEmail(id: MessageId, p: QueuedMessage["payload"]) {
         ...base,
         bookingUrl: appLink(`/bookings/${ref}`),
         calendarUrl: appLink(`/bookings/${ref}/calendar`),
+        googleCalendarUrl: googleCalendarUrl(p.booking),
         address: env.support.address,
       });
     case "email.declined":
@@ -84,12 +86,18 @@ function writeChat(id: MessageId, payload: QueuedMessage["payload"]): ChatMessag
   };
 }
 
+/** A message dropped because its provider isn't set up leaves no row behind, so say so in the logs */
+function notSetUp(row: QueuedMessage, fix: string) {
+  console.warn(`Not sent: ${row.message} for ${row.payload.booking.ref}. ${fix}`);
+  return "skipped" as const;
+}
+
 async function sendOne(row: QueuedMessage, settings: Record<MessageId, boolean>) {
   const info = MESSAGES.find((m) => m.id === row.message);
   // Switched off since it was queued
   if (!info || !settings[row.message]) return "skipped" as const;
   if (info.channel === "email") {
-    if (!env.email) return "skipped" as const;
+    if (!env.email) return notSetUp(row, "Email isn't set up: set EMAIL_DRIVER (and its provider's settings).");
     const { subject, text, html } = writeEmail(row.message, row.payload);
     await (
       await getSender()
@@ -104,7 +112,7 @@ async function sendOne(row: QueuedMessage, settings: Record<MessageId, boolean>)
     return "sent" as const;
   }
   const sender = await getChat();
-  if (!sender) return "skipped" as const;
+  if (!sender) return notSetUp(row, "Slack isn't set up: set CHAT_DRIVER=slack and SLACK_WEBHOOK_URL.");
   await sender.send(writeChat(row.message, row.payload));
   return "sent" as const;
 }
