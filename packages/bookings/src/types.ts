@@ -289,6 +289,8 @@ export interface BookingSnapshot {
   end: string;
   amount: number;
   holdExpiresAt: string | null;
+  /** Booked by a staff member (not a customer), so their name can go in Slack posts */
+  staff?: boolean;
 }
 
 /** Everything needed to write a queued message, so sending doesn't depend on the booking's current state */

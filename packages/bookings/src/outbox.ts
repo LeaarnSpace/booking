@@ -94,6 +94,7 @@ export async function queueBookingMessages(
       end: bookingTable.endsAt,
       amount: bookingTable.amount,
       holdExpiresAt: bookingTable.holdExpiresAt,
+      kind: bookingTable.kind,
       decision: bookingTable.decision,
       prefs: notificationSettings,
     })
@@ -117,6 +118,7 @@ export async function queueBookingMessages(
         end: r.end.toISOString(),
         amount: r.amount,
         holdExpiresAt: r.holdExpiresAt?.toISOString() ?? null,
+        staff: r.kind === "staff",
       },
       ...(event === "declined" && {
         reason: DECLINE_REASONS.find((d) => d.id === decision?.reason)?.label ?? "Other",

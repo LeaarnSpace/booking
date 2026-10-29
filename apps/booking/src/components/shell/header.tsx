@@ -6,6 +6,8 @@ import { cn } from "@/lib/cn";
 import { initials } from "@/lib/format";
 import type { Viewer } from "@/lib/viewer";
 import { DesktopNavLinks } from "./desktop-nav";
+import { HeaderBar } from "./header-bar";
+import { onPhoto } from "./on-photo";
 
 /** Initials and name, linking to the profile */
 export function AccountPill({ viewer, className }: { viewer: Viewer; className?: string }) {
@@ -27,22 +29,20 @@ export function AccountPill({ viewer, className }: { viewer: Viewer; className?:
 
 /**
  * Top bar. Phones get the logo and account pill (navigation is in the bottom bar); wider screens add the
- * links, notifications and sign-in buttons. `overlay` lays it over the landing page's photo.
+ * links, notifications and sign-in buttons. It stays at the top while the page scrolls; `overlay` lays it over
+ * the landing page's photo.
  */
 export function AppHeader({ viewer, unread, overlay }: { viewer: Viewer | null; unread: number; overlay?: boolean }) {
   return (
-    <header
-      className={cn(
-        "z-20 w-full",
-        overlay ? "absolute inset-x-0 top-0 md:bg-white" : "bg-sunk backdrop-blur-[5px] md:bg-white",
-      )}
-    >
-      <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-4 pb-4 pt-6 md:px-20 md:py-5">
-        <Link href="/" aria-label="Learn Space home">
+    <HeaderBar overlay={overlay}>
+      {/* Three columns on laptops and up, so the links sit in the middle of the page whatever is either side; tablets
+          keep a simple row, where a signed-in name wouldn't leave room for equal sides */}
+      <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-4 pb-4 pt-6 lg:grid lg:grid-cols-[1fr_auto_1fr] md:px-20 md:py-5">
+        <Link href="/" aria-label="Learn Space home" className="lg:justify-self-start">
           <Logo />
         </Link>
         <DesktopNavLinks />
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 lg:justify-self-end">
           {viewer ? (
             <>
               <Link
@@ -50,9 +50,9 @@ export function AppHeader({ viewer, unread, overlay }: { viewer: Viewer | null; 
                 className="relative hidden md:block"
                 aria-label={unread ? `Notifications, ${unread} unread` : "Notifications"}
               >
-                <Icon name="bell-pin" />
+                <Icon name="bell-pin" className={onPhoto.icon} />
               </Link>
-              <span className="hidden h-6 w-px bg-line md:block" />
+              <span className={cn("hidden h-6 w-px md:block", onPhoto.divider)} />
               <AccountPill viewer={viewer} />
             </>
           ) : (
@@ -61,7 +61,11 @@ export function AppHeader({ viewer, unread, overlay }: { viewer: Viewer | null; 
                 href="/login"
                 variant="ghost"
                 size="sm"
-                className={cn("text-primary", overlay && "max-md:text-white max-md:hover:bg-white/10")}
+                className={cn(
+                  onPhoto.primary,
+                  // Over the landing photo, until the bar is mostly white
+                  "group-data-clear:hover:bg-white/10 group-data-clear:hover:text-white",
+                )}
               >
                 Login
               </ButtonLink>
@@ -72,6 +76,6 @@ export function AppHeader({ viewer, unread, overlay }: { viewer: Viewer | null; 
           )}
         </div>
       </div>
-    </header>
+    </HeaderBar>
   );
 }
