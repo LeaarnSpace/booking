@@ -23,7 +23,7 @@ export type BookingEvent = "requested" | "confirmed" | "receipt-uploaded" | "dec
 
 const EVENT_MESSAGES: Record<BookingEvent, MessageId[]> = {
   requested: ["email.requested", "slack.requested"],
-  confirmed: ["email.confirmed"],
+  confirmed: ["email.confirmed", "slack.confirmed"],
   "receipt-uploaded": ["email.receipt-received", "slack.receipt-uploaded"],
   declined: ["email.declined"],
   cancelled: ["email.cancelled", "slack.cancelled"],

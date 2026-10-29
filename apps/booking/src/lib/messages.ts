@@ -74,6 +74,7 @@ function writeChat(id: MessageId, payload: QueuedMessage["payload"]): ChatMessag
   const titles: Partial<Record<MessageId, string>> = {
     "slack.requested": `New booking request: ${b.ref}`,
     "slack.receipt-uploaded": `Receipt to review: ${b.ref}`,
+    "slack.confirmed": `Booking confirmed: ${b.ref}`,
     "slack.cancelled": `Booking cancelled: ${b.ref}`,
     "slack.hold-ended": `Hold ran out: ${b.ref}`,
   };

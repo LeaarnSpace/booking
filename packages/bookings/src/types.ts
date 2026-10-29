@@ -246,6 +246,14 @@ export const MESSAGES = [
     defaultEnabled: true,
   },
   {
+    id: "slack.confirmed",
+    channel: "slack",
+    label: "Booking confirmed",
+    description: "Staff approved a receipt and the slot is booked",
+    customerSetting: null,
+    defaultEnabled: true,
+  },
+  {
     id: "slack.cancelled",
     channel: "slack",
     label: "Cancellation",
