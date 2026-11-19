@@ -31,4 +31,12 @@ export const env = {
     /** Holds this close to expiring are flagged on the bookings page */
     holdWarnMinutes: minutes(process.env.BOOKING_HOLD_WARN_MINUTES, 60),
   },
+  website: {
+    /** The website's address, for links to job pages */
+    url: process.env.WEBSITE_URL || "https://learnspace.com.ng",
+    /** Vercel deploy hook for the website project: Publish calls it to rebuild the site with the latest content */
+    deployHookUrl: process.env.WEBSITE_DEPLOY_HOOK_URL || null,
+    /** Shared with the website's build, which sends it to read the content; without it the endpoint is off */
+    contentSecret: process.env.WEBSITE_CONTENT_SECRET || null,
+  },
 };

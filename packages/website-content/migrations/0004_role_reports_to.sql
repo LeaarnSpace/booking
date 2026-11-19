@@ -1,0 +1,1 @@
+ALTER TABLE "website"."role" ADD COLUMN "reports_to" text;

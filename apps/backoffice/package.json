@@ -13,10 +13,12 @@
     "@learnspace/auth-staff": "*",
     "@learnspace/bookings": "*",
     "@learnspace/storage": "*",
+    "@learnspace/website-content": "*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.59.0",
-    "next": "^16.4.2",
+    "marked": "18.1.1",
+    "next": "^16.4.5",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "tailwind-merge": "^3.7.0",
@@ -28,7 +30,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "^16.4.2",
+    "eslint-config-next": "^16.4.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

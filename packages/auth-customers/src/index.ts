@@ -6,4 +6,5 @@ export {
   type CustomerAuth,
   type CustomerAuthOptions,
   type CustomerSignInStore,
+  type SignInCodeContext,
 } from "./auth";

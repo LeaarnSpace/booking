@@ -20,9 +20,10 @@ export interface CustomerAuthOptions {
   google?: { clientId: string; clientSecret: string };
   /**
    * Delivers a sign-in code. Throw if it couldn't be sent, so the person sees an error. Leave it out when no
-   * email provider is set up: emailed codes are then switched off entirely (Google only).
+   * email provider is set up: emailed codes are then switched off entirely (Google only). `from` is what the
+   * sign-in page sent along (see SignInCodeContext), for a one-tap sign-in link in the email.
    */
-  sendSignInCode?: (email: string, code: string) => Promise<void>;
+  sendSignInCode?: (email: string, code: string, from: SignInCodeContext) => Promise<void>;
   /** How long a code works, in minutes */
   codeMinutes?: number;
   /** Framework plugins, e.g. nextCookies() */
@@ -31,16 +32,35 @@ export interface CustomerAuthOptions {
 
 export const CODE_LENGTH = 6;
 
+/**
+ * Where the person was when they asked for a code, sent by the sign-in page as query parameters on the
+ * send-code request (`next`, `name`, `signUp=1`), so a link in the email can finish what they started
+ */
+export interface SignInCodeContext {
+  next?: string;
+  name?: string;
+  signUp: boolean;
+}
+
+const text = (value: unknown, max: number) =>
+  typeof value === "string" && value.trim() ? value.trim().slice(0, max) : undefined;
+
+const signInCodeContext = (query: Record<string, unknown> | undefined): SignInCodeContext => ({
+  next: text(query?.next, 500),
+  name: text(query?.name, 80),
+  signUp: query?.signUp === "1",
+});
+
 /** Sign-in with a 6-digit code sent by email */
-const codePlugin = (send: (email: string, code: string) => Promise<void>, codeMinutes = 10) =>
+const codePlugin = (send: NonNullable<CustomerAuthOptions["sendSignInCode"]>, codeMinutes = 10) =>
   emailOTP({
     otpLength: CODE_LENGTH,
     expiresIn: codeMinutes * 60,
     allowedAttempts: 5,
     storeOTP: "hashed",
-    sendVerificationOTP: async ({ email, otp, type }) => {
+    sendVerificationOTP: async ({ email, otp, type }, ctx) => {
       if (type !== "sign-in") return;
-      await send(email, otp);
+      await send(email, otp, signInCodeContext(ctx?.query as Record<string, unknown> | undefined));
     },
   });
 

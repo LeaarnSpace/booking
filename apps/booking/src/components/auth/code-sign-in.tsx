@@ -1,8 +1,9 @@
 "use client";
 // Sign up or log in without a password: enter your email (and name, when signing up), then the 6-digit code
 // we email you, or continue with Google. Each option shows only when it's set up: without an email provider the
-// page offers Google alone.
-import { useRef, useState } from "react";
+// page offers Google alone. The code verifies itself once all 6 digits are in (typed, pasted or filled in by the
+// phone), and the email's Sign in button works too (see /login/email).
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -37,7 +38,11 @@ export function CodeSignIn({
     setError(null);
     setNotice(null);
     setBusy(true);
-    const { error } = await authClient.emailOtp.sendVerificationOtp({ email: email.trim(), type: "sign-in" });
+    const { error } = await authClient.emailOtp.sendVerificationOtp(
+      { email: email.trim(), type: "sign-in" },
+      // For the email's Sign in link: where to go afterwards, and the name for a new account
+      { query: { next, ...(mode === "sign-up" ? { signUp: "1", name: name.trim() } : {}) } },
+    );
     setBusy(false);
     if (error)
       return setError(
@@ -50,9 +55,26 @@ export function CodeSignIn({
     setTimeout(() => boxes.current[0]?.focus(), 0);
   }
 
+  // Signed in from the email's link in another tab of this browser: carry on here when they come back to it.
+  // Checked only when the tab comes back into view; the session is read from a cookie, not the database.
+  useEffect(() => {
+    if (step !== "code") return;
+    const check = async () => {
+      if (document.visibilityState !== "visible") return;
+      const { data } = await authClient.getSession();
+      if (data?.user.email.toLowerCase() === email.trim().toLowerCase()) {
+        router.replace(next);
+        router.refresh();
+      }
+    };
+    document.addEventListener("visibilitychange", check);
+    return () => document.removeEventListener("visibilitychange", check);
+  }, [step, email, next, router]);
+
   async function verify(digits = code) {
     const otp = digits.join("");
     if (otp.length !== CODE_LENGTH) return setError("Enter all 6 digits");
+    if (busy) return;
     setError(null);
     setBusy(true);
     const { error } = await authClient.signIn.emailOtp({
@@ -72,16 +94,33 @@ export function CodeSignIn({
     router.refresh();
   }
 
-  function typeDigit(i: number, value: string) {
-    const digits = value.replace(/\D/g, "");
-    if (!digits) return setCode(code.map((d, j) => (j === i ? "" : d)));
-    // Pasting the whole code fills every box
+  /** Puts digits into the boxes from box `i` on, and verifies as soon as every box is filled */
+  function fill(i: number, digits: string) {
+    // A whole code (pasted, or filled in by the phone) always starts in the first box, whichever box has focus
+    const start = digits.length >= CODE_LENGTH ? 0 : i;
     const nextCode = [...code];
-    for (let k = 0; k < digits.length && i + k < CODE_LENGTH; k++) nextCode[i + k] = digits[k];
+    for (let k = 0; k < digits.length && start + k < CODE_LENGTH; k++) nextCode[start + k] = digits[k];
     setCode(nextCode);
-    const focus = Math.min(i + digits.length, CODE_LENGTH - 1);
+    setError(null);
+    const focus = Math.min(start + digits.length, CODE_LENGTH - 1);
     boxes.current[focus]?.focus();
     if (nextCode.every(Boolean)) void verify(nextCode);
+  }
+
+  function typeDigit(i: number, value: string) {
+    let digits = value.replace(/\D/g, "");
+    if (!digits) return setCode(code.map((d, j) => (j === i ? "" : d)));
+    // Typed into a filled box without selecting it first: keep the new digit, not both
+    if (digits.length === 2 && code[i]) digits = digits.replace(code[i], "") || code[i];
+    fill(i, digits);
+  }
+
+  /** Pasted text can be "123 456", "Your code is 123456" or digits copied from separate boxes on their own lines */
+  function paste(i: number, e: React.ClipboardEvent<HTMLInputElement>) {
+    const digits = e.clipboardData.getData("text").replace(/\D/g, "");
+    if (!digits) return;
+    e.preventDefault();
+    fill(i, digits.slice(0, CODE_LENGTH));
   }
 
   const continueWithGoogle = () =>
@@ -235,7 +274,9 @@ export function CodeSignIn({
                 inputMode="numeric"
                 autoComplete={i === 0 ? "one-time-code" : "off"}
                 aria-label={`Digit ${i + 1}`}
-                maxLength={i === 0 ? CODE_LENGTH : 1}
+                // Selected on focus, so typing replaces the digit; no maxLength, so a pasted code isn't cut short
+                onFocus={(e) => e.target.select()}
+                onPaste={(e) => paste(i, e)}
                 onChange={(e) => typeDigit(i, e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Backspace" && !d && i > 0) boxes.current[i - 1]?.focus();
