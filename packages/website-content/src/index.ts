@@ -12,6 +12,7 @@ export {
   publishedNews,
   publishedPosts,
   publishedCategories,
+  contentStarted,
   type PublishedRole,
   type PublishedNews,
   type PublishedPost,
