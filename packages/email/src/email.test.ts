@@ -226,6 +226,22 @@ describe("sign-in code template", () => {
     assert.ok(email.html.includes("a&lt;b&gt;@example.com"));
     assert.ok(!email.html.includes("a<b>"));
   });
+
+  it("adds a one-tap sign-in button only when given a link", () => {
+    const url = "https://book.example.com/login/email?email=a%40example.com&code=123456";
+    const withLink = signInCodeEmail({
+      brand: learnSpaceBrand,
+      code: "123456",
+      email: "a@example.com",
+      signInUrl: url,
+    });
+    assert.ok(withLink.html.includes(url.replace(/&/g, "&amp;")));
+    assert.ok(withLink.text.includes(url));
+    // The code also appears as one unbroken run, so it copies whole
+    assert.ok(withLink.html.includes(">123456<"));
+    const without = signInCodeEmail({ brand: learnSpaceBrand, code: "123456", email: "a@example.com" });
+    assert.ok(!without.html.includes("/login/email"));
+  });
 });
 
 describe("booking templates", () => {

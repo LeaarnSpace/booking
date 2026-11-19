@@ -17,8 +17,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "verify": "turbo run check lint test build && prettier --check .",
-    "db:generate": "npm run db:generate -w @learnspace/auth-staff -w @learnspace/bookings",
-    "db:migrate": "npm run db:migrate -w @learnspace/auth-staff -w @learnspace/bookings",
+    "db:generate": "npm run db:generate -w @learnspace/auth-staff -w @learnspace/bookings -w @learnspace/website-content",
+    "db:migrate": "npm run db:migrate -w @learnspace/auth-staff -w @learnspace/bookings -w @learnspace/website-content",
     "db:migrate:deploy": "node scripts/migrate-on-deploy.mjs",
     "db:seed": "npm run db:seed -w @learnspace/bookings",
     "db:studio": "npm run db:studio -w @learnspace/auth-staff"
