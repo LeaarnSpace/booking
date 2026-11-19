@@ -166,3 +166,14 @@ function withoutEmpty<T extends Record<string, unknown>>(row: T) {
     [K in keyof T]: Exclude<T[K], null>;
   };
 }
+
+/**
+ * Whether staff have added anything (live or draft) to each kind. Until they have, the website keeps showing its
+ * own Markdown files for that kind, so switching the site over to the back office never empties a page.
+ */
+export async function contentStarted(): Promise<Record<"roles" | "news" | "blog", boolean>> {
+  const any = async (table: typeof role | typeof news | typeof post) =>
+    (await db.select({ id: table.id }).from(table).limit(1)).length > 0;
+  const [roles, newsStarted, blog] = await Promise.all([any(role), any(news), any(post)]);
+  return { roles, news: newsStarted, blog };
+}

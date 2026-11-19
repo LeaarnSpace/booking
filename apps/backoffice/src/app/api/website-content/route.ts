@@ -3,7 +3,13 @@
 // public addresses in media storage; the website's build downloads and resizes them, so visitors never load them
 // from storage directly.
 import { timingSafeEqual } from "node:crypto";
-import { publishedCategories, publishedNews, publishedPosts, publishedRoles } from "@learnspace/website-content";
+import {
+  contentStarted,
+  publishedCategories,
+  publishedNews,
+  publishedPosts,
+  publishedRoles,
+} from "@learnspace/website-content";
 import { env } from "@/lib/env";
 import { mediaStorage, viewUrl } from "@/lib/storage";
 
@@ -20,12 +26,13 @@ export async function GET(request: Request) {
   if (!secret) return new Response("Not found", { status: 404 });
   const given = request.headers.get("authorization")?.replace(/^Bearer /, "") ?? "";
   if (!matches(given, secret)) return new Response("Unauthorized", { status: 401 });
-  const [roles, news, blog, newsCategories, blogCategories, media] = await Promise.all([
+  const [roles, news, blog, newsCategories, blogCategories, started, media] = await Promise.all([
     publishedRoles(),
     publishedNews(),
     publishedPosts(),
     publishedCategories("news"),
     publishedCategories("blog"),
+    contentStarted(),
     mediaStorage(),
   ]);
   // A week-long link if the bucket isn't public: long enough for any build to fetch it
@@ -41,6 +48,8 @@ export async function GET(request: Request) {
       ),
       blog: await Promise.all(blog.map(async ({ imageKey, ...post }) => ({ ...post, image: await image(imageKey) }))),
       categories: { news: newsCategories, blog: blogCategories },
+      // Kinds nobody has added anything to yet: the website uses its own Markdown files for those
+      started,
     },
     { headers: { "cache-control": "no-store" } },
   );
